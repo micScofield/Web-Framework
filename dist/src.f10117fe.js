@@ -144,6 +144,7 @@ exports.User = void 0;
 var User = function () {
   function User(data) {
     this.data = data;
+    this.events = {};
   }
 
   User.prototype.get = function (propName) {
@@ -152,6 +153,18 @@ var User = function () {
 
   User.prototype.set = function (update) {
     Object.assign(this.data, __assign(__assign({}, this.data), update));
+  };
+
+  User.prototype.on = function (eventName, callback) {
+    var handlers = this.events[eventName] || [];
+    handlers.push(callback);
+    this.events[eventName] = handlers;
+  };
+
+  User.prototype.trigger = function (eventName) {
+    this.events[eventName].forEach(function (callback) {
+      return callback();
+    });
   };
 
   return User;
@@ -168,14 +181,21 @@ Object.defineProperty(exports, "__esModule", {
 var User_1 = require("./Models/User");
 
 var user = new User_1.User({
-  username: 'Brad',
+  username: "Brad",
   age: 12
 });
 console.log(user);
-console.log(user.get('username'));
+console.log(user.get("username"));
 user.set({
   age: 21
 });
+user.on("test", function () {
+  return console.log("test");
+});
+user.on("test", function () {
+  return console.log("test2");
+});
+user.trigger('test');
 console.log(user);
 },{"./Models/User":"src/Models/User.ts"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
