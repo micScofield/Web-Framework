@@ -162,7 +162,9 @@ var User = function () {
   };
 
   User.prototype.trigger = function (eventName) {
-    this.events[eventName].forEach(function (callback) {
+    var handlers = this.events[eventName];
+    if (!handlers || handlers.length === 0) return;
+    handlers.forEach(function (callback) {
       return callback();
     });
   };
@@ -225,7 +227,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52279" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50697" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
