@@ -117,8 +117,24 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/User.ts":[function(require,module,exports) {
+})({"src/Models/User.ts":[function(require,module,exports) {
 "use strict";
+
+var __assign = this && this.__assign || function () {
+  __assign = Object.assign || function (t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+      s = arguments[i];
+
+      for (var p in s) {
+        if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+      }
+    }
+
+    return t;
+  };
+
+  return __assign.apply(this, arguments);
+};
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -134,6 +150,10 @@ var User = function () {
     return this.data[propName];
   };
 
+  User.prototype.set = function (update) {
+    Object.assign(this.data, __assign(__assign({}, this.data), update));
+  };
+
   return User;
 }();
 
@@ -145,7 +165,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var User_1 = require("./User");
+var User_1 = require("./Models/User");
 
 var user = new User_1.User({
   username: 'Brad',
@@ -153,7 +173,11 @@ var user = new User_1.User({
 });
 console.log(user);
 console.log(user.get('username'));
-},{"./User":"src/User.ts"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+user.set({
+  age: 21
+});
+console.log(user);
+},{"./Models/User":"src/Models/User.ts"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
