@@ -169,6 +169,8 @@ var User = function () {
     });
   };
 
+  User.prototype.fetch = function () {};
+
   return User;
 }();
 

@@ -1,12 +1,9 @@
-import { User } from "./Models/User";
+import { User } from './models/User';
 
-const user = new User({ username: "Brad", age: 12 });
+const user = new User({ name: 'new record', age: 0 });
 
-console.log(user);
-console.log(user.get("username"));
+user.events.on('change', () => {
+  console.log('change!');
+});
 
-user.set({ age: 21 });
-user.on("test", () => console.log("test"));
-user.on("test", () => console.log("test2"));
-user.trigger('test');
-console.log(user);
+user.events.trigger('change');
