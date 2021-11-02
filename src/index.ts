@@ -7,3 +7,11 @@ user.events.on('change', () => {
 });
 
 user.events.trigger('change');
+
+// user.sync.save({ name: "SJ", age: 23 });
+setTimeout(() => {
+  user.sync.fetch(1);
+}, 1000)
+setTimeout(() => {
+  console.log(user.sync.data);
+}, 2000);

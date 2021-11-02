@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "concurrently": "^6.3.0",
     "typescript": "^4.4.4"
   },
   "dependencies": {
@@ -7,6 +8,7 @@
   },
   "scripts": {
     "db": "json-server -w db.json",
-    "parcel": "parcel index.html"
+    "parcel": "parcel index.html",
+    "start": "concurrently \"npm run db \" \"npm run parcel\""
   }
 }
