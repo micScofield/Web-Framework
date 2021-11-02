@@ -117,7 +117,32 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/models/Eventing.ts":[function(require,module,exports) {
+})({"src/models/Attributes.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Attributes = void 0;
+
+var Attributes = function () {
+  function Attributes(data) {
+    this.data = data;
+  }
+
+  Attributes.prototype.get = function (propName) {
+    return this.data[propName];
+  };
+
+  Attributes.prototype.set = function (update) {
+    Object.assign(this.data, update);
+  };
+
+  return Attributes;
+}();
+
+exports.Attributes = Attributes;
+},{}],"src/models/Eventing.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2249,7 +2274,7 @@ module.exports.default = axios;
 },{"./utils":"node_modules/axios/lib/utils.js","./helpers/bind":"node_modules/axios/lib/helpers/bind.js","./core/Axios":"node_modules/axios/lib/core/Axios.js","./core/mergeConfig":"node_modules/axios/lib/core/mergeConfig.js","./defaults":"node_modules/axios/lib/defaults.js","./cancel/Cancel":"node_modules/axios/lib/cancel/Cancel.js","./cancel/CancelToken":"node_modules/axios/lib/cancel/CancelToken.js","./cancel/isCancel":"node_modules/axios/lib/cancel/isCancel.js","./env/data":"node_modules/axios/lib/env/data.js","./helpers/spread":"node_modules/axios/lib/helpers/spread.js","./helpers/isAxiosError":"node_modules/axios/lib/helpers/isAxiosError.js"}],"node_modules/axios/index.js":[function(require,module,exports) {
 module.exports = require('./lib/axios');
 },{"./lib/axios":"node_modules/axios/lib/axios.js"}],"src/models/Sync.ts":[function(require,module,exports) {
-"use strict";
+"use strict"; // teaches GENERIC CONSTRAINT (T extends HasId) - HasId constraint around generic class Sync
 
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -2270,18 +2295,17 @@ var Sync = function () {
   }
 
   Sync.prototype.fetch = function (id) {
-    var _this = this;
-
-    axios_1.default.get(this.rootUrl + "/" + id).then(function (response) {
-      _this.data = response.data;
-    });
+    return axios_1.default.get(this.rootUrl + "/" + id);
   };
 
-  Sync.prototype.save = function (data, id) {
+  Sync.prototype.save = function (data) {
+    var id = data.id; // an interface is added so that TS understands inside data we are definitely going to have an ID
+    // id can be a number | undefined here, using a if check helps TS understand what we want for either of these conditions
+
     if (id) {
-      axios_1.default.put(this.rootUrl + "/" + id, data);
+      return axios_1.default.put(this.rootUrl + "/" + id, data);
     } else {
-      axios_1.default.post("" + this.rootUrl, data);
+      return axios_1.default.post("" + this.rootUrl, data);
     }
   };
 
@@ -2297,30 +2321,26 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.User = void 0;
 
+var Attributes_1 = require("./Attributes");
+
 var Eventing_1 = require("./Eventing");
 
 var Sync_1 = require("./Sync");
 
+var rootUrl = "http://localhost:3000";
+
 var User = function () {
-  function User(data) {
-    this.data = data;
+  function User() {
     this.events = new Eventing_1.Eventing();
-    this.sync = new Sync_1.Sync();
+    this.sync = new Sync_1.Sync(rootUrl);
+    this.attributes = new Attributes_1.Attributes({});
   }
-
-  User.prototype.get = function (propName) {
-    return this.data[propName];
-  };
-
-  User.prototype.set = function (update) {
-    Object.assign(this.data, update);
-  };
 
   return User;
 }();
 
 exports.User = User;
-},{"./Eventing":"src/models/Eventing.ts","./Sync":"src/models/Sync.ts"}],"src/index.ts":[function(require,module,exports) {
+},{"./Attributes":"src/models/Attributes.ts","./Eventing":"src/models/Eventing.ts","./Sync":"src/models/Sync.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2336,14 +2356,7 @@ var user = new User_1.User({
 user.events.on('change', function () {
   console.log('change!');
 });
-user.events.trigger('change'); // user.sync.save({ name: "SJ", age: 23 });
-
-setTimeout(function () {
-  user.sync.fetch(1);
-}, 1000);
-setTimeout(function () {
-  console.log(user.sync.data);
-}, 2000);
+user.events.trigger('change');
 },{"./models/User":"src/models/User.ts"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
