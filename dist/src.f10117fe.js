@@ -2265,21 +2265,23 @@ exports.Sync = void 0;
 var axios_1 = __importDefault(require("axios"));
 
 var Sync = function () {
-  function Sync() {}
+  function Sync(rootUrl) {
+    this.rootUrl = rootUrl;
+  }
 
   Sync.prototype.fetch = function (id) {
     var _this = this;
 
-    axios_1.default.get("http://localhost:3000/users/" + id).then(function (response) {
+    axios_1.default.get(this.rootUrl + "/" + id).then(function (response) {
       _this.data = response.data;
     });
   };
 
   Sync.prototype.save = function (data, id) {
     if (id) {
-      axios_1.default.put("http://localhost:3000/users/" + id, data);
+      axios_1.default.put(this.rootUrl + "/" + id, data);
     } else {
-      axios_1.default.post("http://localhost:3000/users", data);
+      axios_1.default.post("" + this.rootUrl, data);
     }
   };
 

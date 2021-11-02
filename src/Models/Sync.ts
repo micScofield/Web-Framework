@@ -3,9 +3,11 @@ import axios, { AxiosResponse } from "axios";
 export class Sync<T> {
     data: T;
 
+    constructor(public rootUrl: string) {}
+
     fetch(id: number): void {
         axios
-            .get(`http://localhost:3000/users/${id}`)
+            .get(`${this.rootUrl}/${id}`)
             .then((response: AxiosResponse): void => {
                 this.data = response.data;
             });
@@ -13,9 +15,9 @@ export class Sync<T> {
 
     save(data: T, id?: number): void {
         if (id) {
-            axios.put(`http://localhost:3000/users/${id}`, data);
+            axios.put(`${this.rootUrl}/${id}`, data);
         } else {
-            axios.post("http://localhost:3000/users", data);
+            axios.post(`${this.rootUrl}`, data);
         }
     }
 }
