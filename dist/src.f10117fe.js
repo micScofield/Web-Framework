@@ -117,7 +117,146 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
+})({"src/models/Model.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Model = void 0;
+
+var Model = function () {
+  function Model(attributes, events, sync) {
+    this.attributes = attributes;
+    this.events = events;
+    this.sync = sync; // get on() {
+    //     return this.events.on;
+    // }
+    // get trigger() {
+    //     return this.events.trigger;
+    // }
+    // get get() {
+    //     return this.attributes.get;
+    // }
+    // since we have events/attributes/sync initlaised in constructor, we can shorten the passthrough methods. Earlier this couldn't have been possible as we are not sure of which line gets executed first, and we could have seen some undefined errors.
+
+    this.on = this.events.on;
+    this.trigger = this.events.trigger;
+    this.get = this.attributes.get;
+  }
+
+  Model.prototype.set = function (update) {
+    this.attributes.set(update);
+    this.trigger("change");
+  };
+
+  Model.prototype.fetch = function () {
+    var _this = this;
+
+    var id = this.attributes.get("id");
+    if (!id) throw new Error("ID is required !"); // const data = (await this.sync.fetch(id)) as UserProps;
+    // this.set(data);
+
+    this.sync.fetch(id).then(function (response) {
+      _this.set(response.data);
+    });
+  };
+
+  Model.prototype.save = function () {
+    var _this = this;
+
+    var data = this.attributes.getAll();
+    this.sync.save(data).then(function (response) {
+      _this.trigger("save");
+    }).catch(function () {
+      _this.trigger("error");
+    });
+  };
+
+  return Model;
+}();
+
+exports.Model = Model;
+},{}],"src/models/Attributes.ts":[function(require,module,exports) {
+"use strict";
+/*
+Note:
+1. Advanced Generic Constraint
+<K extends keyof T>(key: K): T[K]
+K extends keyof T means that the value of "K" can only be a key of an object "T", and obviously the return value can be set to T[K] instead of a union which we had earlier (eg: string | number | boolean).
+
+2. Why use arrow function for get ?
+If we used normal function syntax, it would have its own reference of "this" and when we try to use passthrough functionality on it (eg: calling user.get('name')), it would reference "user" as "this" which would throw an error. Instead its "this" should be referencing to the class's "this".
+
+IMPORTANT - Point 2 needs to be fixed for all composite classes where we are referencing "this". Convert all to arrow functions
+*/
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Attributes = void 0;
+
+var Attributes = function () {
+  function Attributes(data) {
+    var _this = this;
+
+    this.data = data;
+
+    this.get = function (key) {
+      return _this.data[key];
+    };
+  }
+
+  Attributes.prototype.set = function (update) {
+    Object.assign(this.data, update);
+  };
+
+  Attributes.prototype.getAll = function () {
+    return this.data;
+  };
+
+  return Attributes;
+}();
+
+exports.Attributes = Attributes;
+},{}],"src/models/Eventing.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Eventing = void 0;
+
+var Eventing = function () {
+  function Eventing() {
+    var _this = this;
+
+    this.events = {};
+
+    this.on = function (eventName, callback) {
+      var handlers = _this.events[eventName] || [];
+      handlers.push(callback);
+      _this.events[eventName] = handlers;
+    };
+
+    this.trigger = function (eventName) {
+      var handlers = _this.events[eventName];
+
+      if (!handlers || handlers.length === 0) {
+        return;
+      }
+
+      handlers.forEach(function (callback) {
+        callback();
+      });
+    };
+  }
+
+  return Eventing;
+}();
+
+exports.Eventing = Eventing;
+},{}],"node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -2213,44 +2352,47 @@ module.exports.default = axios;
 
 },{"./utils":"node_modules/axios/lib/utils.js","./helpers/bind":"node_modules/axios/lib/helpers/bind.js","./core/Axios":"node_modules/axios/lib/core/Axios.js","./core/mergeConfig":"node_modules/axios/lib/core/mergeConfig.js","./defaults":"node_modules/axios/lib/defaults.js","./cancel/Cancel":"node_modules/axios/lib/cancel/Cancel.js","./cancel/CancelToken":"node_modules/axios/lib/cancel/CancelToken.js","./cancel/isCancel":"node_modules/axios/lib/cancel/isCancel.js","./env/data":"node_modules/axios/lib/env/data.js","./helpers/spread":"node_modules/axios/lib/helpers/spread.js","./helpers/isAxiosError":"node_modules/axios/lib/helpers/isAxiosError.js"}],"node_modules/axios/index.js":[function(require,module,exports) {
 module.exports = require('./lib/axios');
-},{"./lib/axios":"node_modules/axios/lib/axios.js"}],"src/models/Eventing.ts":[function(require,module,exports) {
-"use strict";
+},{"./lib/axios":"node_modules/axios/lib/axios.js"}],"src/models/ApiSync.ts":[function(require,module,exports) {
+"use strict"; // teaches GENERIC CONSTRAINT (T extends HasId) - HasId constraint around generic class Sync
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Eventing = void 0;
+exports.ApiSync = void 0;
 
-var Eventing = function () {
-  function Eventing() {
-    var _this = this;
+var axios_1 = __importDefault(require("axios"));
 
-    this.events = {};
-
-    this.on = function (eventName, callback) {
-      var handlers = _this.events[eventName] || [];
-      handlers.push(callback);
-      _this.events[eventName] = handlers;
-    };
-
-    this.trigger = function (eventName) {
-      var handlers = _this.events[eventName];
-
-      if (!handlers || handlers.length === 0) {
-        return;
-      }
-
-      handlers.forEach(function (callback) {
-        callback();
-      });
-    };
+var ApiSync = function () {
+  function ApiSync(rootUrl) {
+    this.rootUrl = rootUrl;
   }
 
-  return Eventing;
+  ApiSync.prototype.fetch = function (id) {
+    return axios_1.default.get(this.rootUrl + "/" + id);
+  };
+
+  ApiSync.prototype.save = function (data) {
+    var id = data.id; // an interface is added so that TS understands inside data we are definitely going to have an ID
+    // id can be a number | undefined here, using a if check helps TS understand what we want for either of these conditions
+
+    if (id) {
+      return axios_1.default.put(this.rootUrl + "/" + id, data);
+    } else {
+      return axios_1.default.post("" + this.rootUrl, data);
+    }
+  };
+
+  return ApiSync;
 }();
 
-exports.Eventing = Eventing;
-},{}],"src/models/Collection.ts":[function(require,module,exports) {
+exports.ApiSync = ApiSync;
+},{"axios":"node_modules/axios/index.js"}],"src/models/Collection.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -2309,149 +2451,7 @@ var Collection = function () {
 }();
 
 exports.Collection = Collection;
-},{"axios":"node_modules/axios/index.js","./Eventing":"src/models/Eventing.ts"}],"src/models/Model.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Model = void 0;
-
-var Model = function () {
-  function Model(attributes, events, sync) {
-    this.attributes = attributes;
-    this.events = events;
-    this.sync = sync; // get on() {
-    //     return this.events.on;
-    // }
-    // get trigger() {
-    //     return this.events.trigger;
-    // }
-    // get get() {
-    //     return this.attributes.get;
-    // }
-    // since we have events/attributes/sync initlaised in constructor, we can shorten the passthrough methods. Earlier this couldn't have been possible as we are not sure of which line gets executed first, and we could have seen some undefined errors.
-
-    this.on = this.events.on;
-    this.trigger = this.events.trigger;
-    this.get = this.attributes.get;
-  }
-
-  Model.prototype.set = function (update) {
-    this.attributes.set(update);
-    this.trigger("change");
-  };
-
-  Model.prototype.fetch = function () {
-    var _this = this;
-
-    var id = this.attributes.get("id");
-    if (!id) throw new Error("ID is required !"); // const data = (await this.sync.fetch(id)) as UserProps;
-    // this.set(data);
-
-    this.sync.fetch(id).then(function (response) {
-      _this.set(response.data);
-    });
-  };
-
-  Model.prototype.save = function () {
-    var _this = this;
-
-    var data = this.attributes.getAll();
-    this.sync.save(data).then(function (response) {
-      _this.trigger("save");
-    }).catch(function () {
-      _this.trigger("error");
-    });
-  };
-
-  return Model;
-}();
-
-exports.Model = Model;
-},{}],"src/models/Attributes.ts":[function(require,module,exports) {
-"use strict";
-/*
-Note:
-1. Advanced Generic Constraint
-<K extends keyof T>(key: K): T[K]
-K extends keyof T means that the value of "K" can only be a key of an object "T", and obviously the return value can be set to T[K] instead of a union which we had earlier (eg: string | number | boolean).
-
-2. Why use arrow function for get ?
-If we used normal function syntax, it would have its own reference of "this" and when we try to use passthrough functionality on it (eg: calling user.get('name')), it would reference "user" as "this" which would throw an error. Instead its "this" should be referencing to the class's "this".
-
-IMPORTANT - Point 2 needs to be fixed for all composite classes where we are referencing "this". Convert all to arrow functions
-*/
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Attributes = void 0;
-
-var Attributes = function () {
-  function Attributes(data) {
-    var _this = this;
-
-    this.data = data;
-
-    this.get = function (key) {
-      return _this.data[key];
-    };
-  }
-
-  Attributes.prototype.set = function (update) {
-    Object.assign(this.data, update);
-  };
-
-  Attributes.prototype.getAll = function () {
-    return this.data;
-  };
-
-  return Attributes;
-}();
-
-exports.Attributes = Attributes;
-},{}],"src/models/ApiSync.ts":[function(require,module,exports) {
-"use strict"; // teaches GENERIC CONSTRAINT (T extends HasId) - HasId constraint around generic class Sync
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.ApiSync = void 0;
-
-var axios_1 = __importDefault(require("axios"));
-
-var ApiSync = function () {
-  function ApiSync(rootUrl) {
-    this.rootUrl = rootUrl;
-  }
-
-  ApiSync.prototype.fetch = function (id) {
-    return axios_1.default.get(this.rootUrl + "/" + id);
-  };
-
-  ApiSync.prototype.save = function (data) {
-    var id = data.id; // an interface is added so that TS understands inside data we are definitely going to have an ID
-    // id can be a number | undefined here, using a if check helps TS understand what we want for either of these conditions
-
-    if (id) {
-      return axios_1.default.put(this.rootUrl + "/" + id, data);
-    } else {
-      return axios_1.default.post("" + this.rootUrl, data);
-    }
-  };
-
-  return ApiSync;
-}();
-
-exports.ApiSync = ApiSync;
-},{"axios":"node_modules/axios/index.js"}],"src/models/User.ts":[function(require,module,exports) {
+},{"axios":"node_modules/axios/index.js","./Eventing":"src/models/Eventing.ts"}],"src/models/User.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -2495,6 +2495,8 @@ var Eventing_1 = require("./Eventing");
 
 var ApiSync_1 = require("./ApiSync");
 
+var Collection_1 = require("./Collection");
+
 var rootUrl = "http://localhost:3000/users";
 
 var User = function (_super) {
@@ -2506,6 +2508,13 @@ var User = function (_super) {
 
   User.buildUser = function (attrs) {
     return new User(new Attributes_1.Attributes(attrs), new Eventing_1.Eventing(), new ApiSync_1.ApiSync(rootUrl));
+  }; // static method which gets us a collection of users
+
+
+  User.buildUserCollection = function () {
+    return new Collection_1.Collection(rootUrl, function (json) {
+      return User.buildUser(json);
+    });
   };
 
   User.prototype.isAdminUser = function () {
@@ -2585,26 +2594,21 @@ export class User {
     }
 }
 */
-},{"./Model":"src/models/Model.ts","./Attributes":"src/models/Attributes.ts","./Eventing":"src/models/Eventing.ts","./ApiSync":"src/models/ApiSync.ts"}],"src/index.ts":[function(require,module,exports) {
+},{"./Model":"src/models/Model.ts","./Attributes":"src/models/Attributes.ts","./Eventing":"src/models/Eventing.ts","./ApiSync":"src/models/ApiSync.ts","./Collection":"src/models/Collection.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var Collection_1 = require("./models/Collection");
-
 var User_1 = require("./models/User");
 
-var usersUrl = "http://localhost:3000/users";
-var collection = new Collection_1.Collection(usersUrl, function (json) {
-  return User_1.User.buildUser(json);
-});
+var collection = User_1.User.buildUserCollection();
 collection.on("change", function () {
   console.log("Changed", collection);
 });
 collection.fetch();
-},{"./models/Collection":"src/models/Collection.ts","./models/User":"src/models/User.ts"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./models/User":"src/models/User.ts"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
