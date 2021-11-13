@@ -1,6 +1,7 @@
 import { Attributes } from "./Attributes";
 import { Eventing } from "./Eventing";
 import { Sync } from "./Sync";
+import { AxiosResponse } from "axios";
 
 interface UserProps {
     id?: number;
@@ -8,7 +9,7 @@ interface UserProps {
     age?: number;
 }
 
-const rootUrl = "http://localhost:3000";
+const rootUrl = "http://localhost:3000/users";
 
 export class User {
     public events: Eventing = new Eventing();
@@ -33,7 +34,20 @@ export class User {
     }
 
     set(update: UserProps) {
-        this.attributes.set(update)
-        this.trigger('change');
+        this.attributes.set(update);
+        this.trigger("change");
+    }
+
+    fetch(): void {
+        const id = this.attributes.get("id");
+
+        if (!id) throw new Error("ID is required !");
+
+        // const data = (await this.sync.fetch(id)) as UserProps;
+        // this.set(data);
+
+        this.sync.fetch(id).then((response: AxiosResponse): void => {
+            this.set(response.data);
+        });
     }
 }

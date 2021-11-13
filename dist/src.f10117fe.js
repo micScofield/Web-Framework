@@ -2342,7 +2342,7 @@ var Eventing_1 = require("./Eventing");
 
 var Sync_1 = require("./Sync");
 
-var rootUrl = "http://localhost:3000";
+var rootUrl = "http://localhost:3000/users";
 
 var User = function () {
   // we have a different syntax for Attributes because it expects some data during initialization and we will receive that data (attributes) as constructor of this class itself
@@ -2376,7 +2376,19 @@ var User = function () {
 
   User.prototype.set = function (update) {
     this.attributes.set(update);
-    this.trigger('change');
+    this.trigger("change");
+  };
+
+  User.prototype.fetch = function () {
+    var _this = this;
+
+    var id = this.attributes.get("id");
+    if (!id) throw new Error("ID is required !"); // const data = (await this.sync.fetch(id)) as UserProps;
+    // this.set(data);
+
+    this.sync.fetch(id).then(function (response) {
+      _this.set(response.data);
+    });
   };
 
   return User;
@@ -2393,16 +2405,12 @@ Object.defineProperty(exports, "__esModule", {
 var User_1 = require("./models/User");
 
 var user = new User_1.User({
-  name: "Sanyam",
-  age: 22
+  id: 1
 });
 user.on("change", function () {
-  console.log("change!");
+  console.log("change!", user);
 });
-user.set({
-  name: "SJ"
-});
-console.log(user.get("name"));
+user.fetch();
 },{"./models/User":"src/models/User.ts"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
