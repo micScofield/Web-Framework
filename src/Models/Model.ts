@@ -29,17 +29,22 @@ export class Model<T extends HasId> {
         private sync: Sync<T>
     ) {}
 
-    get on() {
-        return this.events.on;
-    }
+    // get on() {
+    //     return this.events.on;
+    // }
 
-    get trigger() {
-        return this.events.trigger;
-    }
+    // get trigger() {
+    //     return this.events.trigger;
+    // }
 
-    get get() {
-        return this.attributes.get;
-    }
+    // get get() {
+    //     return this.attributes.get;
+    // }
+
+    // since we have events/attributes/sync initlaised in constructor, we can shorten the passthrough methods. Earlier this couldn't have been possible as we are not sure of which line gets executed first, and we could have seen some undefined errors.
+    on = this.events.on;
+    trigger = this.events.trigger;
+    get = this.attributes.get;
 
     set(update: T) {
         this.attributes.set(update);

@@ -1,4 +1,4 @@
-import { Model } from './Model'
+import { Model } from "./Model";
 import { Attributes } from "./Attributes";
 import { Eventing } from "./Eventing";
 import { ApiSync } from "./ApiSync";
@@ -17,11 +17,16 @@ export class User extends Model<UserProps> {
             new Attributes<UserProps>(attrs),
             new Eventing(),
             new ApiSync<UserProps>(rootUrl)
-        )
+        );
+    }
+
+    isAdminUser(): boolean {
+        // we can have some real implementation here
+        return false;
     }
 }
 
-// Implementation before we introduced a generic Model class - 
+// Implementation before we introduced a generic Model class -
 /*
 import { Attributes } from "./Attributes";
 import { Eventing } from "./Eventing";

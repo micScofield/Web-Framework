@@ -129,30 +129,21 @@ var Model = function () {
   function Model(attributes, events, sync) {
     this.attributes = attributes;
     this.events = events;
-    this.sync = sync;
-  }
+    this.sync = sync; // get on() {
+    //     return this.events.on;
+    // }
+    // get trigger() {
+    //     return this.events.trigger;
+    // }
+    // get get() {
+    //     return this.attributes.get;
+    // }
+    // since we have events/attributes/sync initlaised in constructor, we can shorten the passthrough methods. Earlier this couldn't have been possible as we are not sure of which line gets executed first, and we could have seen some undefined errors.
 
-  Object.defineProperty(Model.prototype, "on", {
-    get: function get() {
-      return this.events.on;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(Model.prototype, "trigger", {
-    get: function get() {
-      return this.events.trigger;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(Model.prototype, "get", {
-    get: function get() {
-      return this.attributes.get;
-    },
-    enumerable: false,
-    configurable: true
-  });
+    this.on = this.events.on;
+    this.trigger = this.events.trigger;
+    this.get = this.attributes.get;
+  }
 
   Model.prototype.set = function (update) {
     this.attributes.set(update);
@@ -2458,10 +2449,15 @@ var User = function (_super) {
     return new User(new Attributes_1.Attributes(attrs), new Eventing_1.Eventing(), new ApiSync_1.ApiSync(rootUrl));
   };
 
+  User.prototype.isAdminUser = function () {
+    // we can have some real implementation here
+    return false;
+  };
+
   return User;
 }(Model_1.Model);
 
-exports.User = User; // Implementation before we introduced a generic Model class - 
+exports.User = User; // Implementation before we introduced a generic Model class -
 
 /*
 import { Attributes } from "./Attributes";
