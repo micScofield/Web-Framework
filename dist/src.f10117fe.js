@@ -127,6 +127,8 @@ K extends keyof T means that the value of "K" can only be a key of an object "T"
 
 2. Why use arrow function for get ?
 If we used normal function syntax, it would have its own reference of "this" and when we try to use passthrough functionality on it (eg: calling user.get('name')), it would reference "user" as "this" which would throw an error. Instead its "this" should be referencing to the class's "this".
+
+IMPORTANT - Point 2 needs to be fixed for all composite classes where we are referencing "this". Convert all to arrow functions
 */
 
 Object.defineProperty(exports, "__esModule", {
@@ -163,26 +165,28 @@ exports.Eventing = void 0;
 
 var Eventing = function () {
   function Eventing() {
+    var _this = this;
+
     this.events = {};
+
+    this.on = function (eventName, callback) {
+      var handlers = _this.events[eventName] || [];
+      handlers.push(callback);
+      _this.events[eventName] = handlers;
+    };
+
+    this.trigger = function (eventName) {
+      var handlers = _this.events[eventName];
+
+      if (!handlers || handlers.length === 0) {
+        return;
+      }
+
+      handlers.forEach(function (callback) {
+        callback();
+      });
+    };
   }
-
-  Eventing.prototype.on = function (eventName, callback) {
-    var handlers = this.events[eventName] || [];
-    handlers.push(callback);
-    this.events[eventName] = handlers;
-  };
-
-  Eventing.prototype.trigger = function (eventName) {
-    var handlers = this.events[eventName];
-
-    if (!handlers || handlers.length === 0) {
-      return;
-    }
-
-    handlers.forEach(function (callback) {
-      callback();
-    });
-  };
 
   return Eventing;
 }();
@@ -2390,7 +2394,7 @@ user.on('change', function () {
   console.log('change!');
 });
 user.trigger('change');
-user.get('name');
+console.log(user.get('name'));
 },{"./models/User":"src/models/User.ts"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';

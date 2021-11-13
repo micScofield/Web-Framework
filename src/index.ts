@@ -8,4 +8,4 @@ user.on('change', () => {
 
 user.trigger('change');
 
-user.get('name');
+console.log(user.get('name'));

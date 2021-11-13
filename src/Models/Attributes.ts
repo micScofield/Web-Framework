@@ -6,6 +6,8 @@ K extends keyof T means that the value of "K" can only be a key of an object "T"
 
 2. Why use arrow function for get ? 
 If we used normal function syntax, it would have its own reference of "this" and when we try to use passthrough functionality on it (eg: calling user.get('name')), it would reference "user" as "this" which would throw an error. Instead its "this" should be referencing to the class's "this".
+
+IMPORTANT - Point 2 needs to be fixed for all composite classes where we are referencing "this". Convert all to arrow functions
 */
 
 export class Attributes<T> {
