@@ -119,6 +119,15 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   return newRequire;
 })({"src/models/Attributes.ts":[function(require,module,exports) {
 "use strict";
+/*
+Note:
+1. Advanced Generic Constraint
+<K extends keyof T>(key: K): T[K]
+K extends keyof T means that the value of "K" can only be a key of an object "T", and obviously the return value can be set to T[K] instead of a union which we had earlier (eg: string | number | boolean).
+
+2. Why use arrow function for get ?
+If we used normal function syntax, it would have its own reference of "this" and when we try to use passthrough functionality on it (eg: calling user.get('name')), it would reference "user" as "this" which would throw an error. Instead its "this" should be referencing to the class's "this".
+*/
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -127,12 +136,14 @@ exports.Attributes = void 0;
 
 var Attributes = function () {
   function Attributes(data) {
-    this.data = data;
-  }
+    var _this = this;
 
-  Attributes.prototype.get = function (propName) {
-    return this.data[propName];
-  };
+    this.data = data;
+
+    this.get = function (key) {
+      return _this.data[key];
+    };
+  }
 
   Attributes.prototype.set = function (update) {
     Object.assign(this.data, update);
@@ -2330,12 +2341,34 @@ var Sync_1 = require("./Sync");
 var rootUrl = "http://localhost:3000";
 
 var User = function () {
-  function User() {
+  // we have a different syntax for Attributes because it expects some data during initialization and we will receive that data (attributes) as constructor of this class itself
+  function User(attrs) {
     this.events = new Eventing_1.Eventing();
     this.sync = new Sync_1.Sync(rootUrl);
-    this.attributes = new Attributes_1.Attributes({});
+    this.attributes = new Attributes_1.Attributes(attrs);
   }
 
+  Object.defineProperty(User.prototype, "on", {
+    get: function get() {
+      return this.events.on;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(User.prototype, "trigger", {
+    get: function get() {
+      return this.events.trigger;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(User.prototype, "get", {
+    get: function get() {
+      return this.attributes.get;
+    },
+    enumerable: false,
+    configurable: true
+  });
   return User;
 }();
 
@@ -2350,13 +2383,14 @@ Object.defineProperty(exports, "__esModule", {
 var User_1 = require("./models/User");
 
 var user = new User_1.User({
-  name: 'new record',
-  age: 0
+  name: 'Sanyam',
+  age: 22
 });
-user.events.on('change', function () {
+user.on('change', function () {
   console.log('change!');
 });
-user.events.trigger('change');
+user.trigger('change');
+user.get('name');
 },{"./models/User":"src/models/User.ts"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -2385,7 +2419,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63187" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49362" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
