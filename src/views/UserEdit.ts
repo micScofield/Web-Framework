@@ -1,4 +1,6 @@
 import { User, UserProps } from "../models/User";
+import { UserForm } from "./UserForm";
+import { UserShow } from "./UserShow";
 import { View } from "./View";
 
 export class UserEdit extends View<User, UserProps> {
@@ -7,6 +9,15 @@ export class UserEdit extends View<User, UserProps> {
             userShow: ".user-show",
             userForm: ".user-form",
         };
+    }
+
+    onRender(): void {
+        // create instances of both regions and call render
+        const userShow = new UserShow(this.regions.userShow, this.model);
+        userShow.render();
+
+        const userForm = new UserForm(this.regions.userForm, this.model);
+        userForm.render();
     }
 
     template(): string {

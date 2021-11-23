@@ -55,8 +55,8 @@ export abstract class View<T extends Model<K>, K> {
 
             const element = fragment.querySelector(selector);
 
-            if(element) {
-              this.regions[key] = element;
+            if (element) {
+                this.regions[key] = element;
             }
 
             /* regions might look like {
@@ -67,6 +67,8 @@ export abstract class View<T extends Model<K>, K> {
         }
     }
 
+    onRender(): void {}
+
     render(): void {
         this.parent.innerHTML = "";
 
@@ -76,6 +78,9 @@ export abstract class View<T extends Model<K>, K> {
         this.bindEvents(templateElement.content);
 
         this.mapRegions(templateElement.content);
+
+        // setup view nesting right before we render html to the dom
+        this.onRender();
 
         this.parent.append(templateElement.content);
     }
