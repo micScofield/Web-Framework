@@ -4,9 +4,9 @@ import { View } from "./View";
 export class UserEdit extends View<User, UserProps> {
     regionsMap(): { [key: string]: string } {
         return {
-            userShow: '.user-show',
-            userForm: '.user-form'
-        }
+            userShow: ".user-show",
+            userForm: ".user-form",
+        };
     }
 
     template(): string {
