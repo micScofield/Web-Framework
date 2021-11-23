@@ -10,6 +10,8 @@ interface ModelForView {
 }
 
 export abstract class View<T extends Model<K>, K> {
+    regions: { [key: string]: Element } = {};
+
     constructor(public parent: Element, public model: T) {
         this.bindModel();
     }
@@ -21,6 +23,10 @@ export abstract class View<T extends Model<K>, K> {
     }
 
     abstract template(): string;
+
+    regionsMap(): { [key: string]: string } { // eg: { 'UserShow': '.user-show' }
+      return {}
+    }
 
     bindModel(): void {
         this.model.on("change", () => {

@@ -130,11 +130,16 @@ var View = function () {
   function View(parent, model) {
     this.parent = parent;
     this.model = model;
+    this.regions = {};
     this.bindModel();
   } // abstract eventsMap(): { [key: string]: () => void };
 
 
   View.prototype.eventsMap = function () {
+    return {};
+  };
+
+  View.prototype.regionsMap = function () {
     return {};
   };
 
