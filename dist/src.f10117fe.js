@@ -118,21 +118,27 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"src/views/View.ts":[function(require,module,exports) {
-"use strict";
+"use strict"; // IMPORTANT - 1. A workaround if we don't want to use Model from "../models/Model" is to use ModelForView. But it is not ideal. Model however is also a Generic class which expects an interface eg: UserProps. So when creating a child class out of this, we can specify User and UserProps as two generic types. 
+// 2. To have an method which may or may not be implemented by child class (i.e. optional), we can use 2nd implementation of eventsMap. If its a must we can use 1st one which is commented out.
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Form = void 0;
+exports.View = void 0;
 
-var Form = function () {
-  function Form(parent, model) {
+var View = function () {
+  function View(parent, model) {
     this.parent = parent;
     this.model = model;
     this.bindModel();
-  }
+  } // abstract eventsMap(): { [key: string]: () => void };
 
-  Form.prototype.bindModel = function () {
+
+  View.prototype.eventsMap = function () {
+    return {};
+  };
+
+  View.prototype.bindModel = function () {
     var _this = this;
 
     this.model.on("change", function () {
@@ -140,7 +146,7 @@ var Form = function () {
     });
   };
 
-  Form.prototype.bindEvents = function (fragment) {
+  View.prototype.bindEvents = function (fragment) {
     var eventsMap = this.eventsMap();
 
     var _loop_1 = function _loop_1(eventKey) {
@@ -158,7 +164,7 @@ var Form = function () {
     }
   };
 
-  Form.prototype.render = function () {
+  View.prototype.render = function () {
     this.parent.innerHTML = "";
     var templateElement = document.createElement("template");
     templateElement.innerHTML = this.template();
@@ -166,10 +172,10 @@ var Form = function () {
     this.parent.append(templateElement.content);
   };
 
-  return Form;
+  return View;
 }();
 
-exports.Form = Form;
+exports.View = View;
 },{}],"src/views/UserForm.ts":[function(require,module,exports) {
 "use strict";
 
@@ -249,16 +255,8 @@ var UserForm = function (_super) {
     return "\n      <div>\n        <input placeholder=\"" + this.model.get('name') + "\" />\n        <button class=\"set-name\">Change Name</button>\n        <button class=\"set-age\">Set Random Age</button>\n        <button class=\"save-model\">Save</button>\n      </div>\n    ";
   };
 
-  UserForm.prototype.render = function () {
-    this.parent.innerHTML = '';
-    var templateElement = document.createElement('template');
-    templateElement.innerHTML = this.template();
-    this.bindEvents(templateElement.content);
-    this.parent.append(templateElement.content);
-  };
-
   return UserForm;
-}(View_1.Form);
+}(View_1.View);
 
 exports.UserForm = UserForm;
 },{"./View":"src/views/View.ts"}],"src/models/Model.ts":[function(require,module,exports) {
