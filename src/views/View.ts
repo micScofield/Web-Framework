@@ -2,7 +2,7 @@ import { Model } from "../models/Model";
 
 type Callback = () => void;
 
-// A workaround if we don't want to use Model from "../models/Model". But it is not ideal.
+// IMPORTANT - A workaround if we don't want to use Model from "../models/Model". But it is not ideal. Model however is also a Generic class which expects an interface eg: UserProps. So when creating a child class out of this, we can specify User and UserProps as two generic types.
 interface ModelForView {
     on(eventName: string, callback: Callback): void;
 }
