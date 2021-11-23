@@ -117,7 +117,34 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/models/Model.ts":[function(require,module,exports) {
+})({"src/views/UserForm.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.UserForm = void 0;
+
+var UserForm = function () {
+  function UserForm(parent, model) {
+    this.parent = parent;
+    this.model = model;
+    this.bindModel();
+  }
+
+  UserForm.prototype.bindModel = function () {
+    var _this = this;
+
+    this.model.on('change', function () {
+      _this.render();
+    });
+  };
+
+  return UserForm;
+}();
+
+exports.UserForm = UserForm;
+},{}],"src/models/Model.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2517,9 +2544,11 @@ var User = function (_super) {
     });
   };
 
-  User.prototype.isAdminUser = function () {
-    // we can have some real implementation here
-    return false;
+  User.prototype.setRandomAge = function () {
+    var age = Math.round(Math.random() * 100);
+    this.set({
+      age: age
+    });
   };
 
   return User;
@@ -2601,14 +2630,23 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var UserForm_1 = require("./views/UserForm");
+
 var User_1 = require("./models/User");
 
-var collection = User_1.User.buildUserCollection();
-collection.on("change", function () {
-  console.log("Changed", collection);
+var user = User_1.User.buildUser({
+  name: 'NAME',
+  age: 20
 });
-collection.fetch();
-},{"./models/User":"src/models/User.ts"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+var root = document.getElementById('root');
+
+if (root) {
+  var userForm = new UserForm_1.UserForm(root, user);
+  userForm.render();
+} else {
+  throw new Error('Root element not found');
+}
+},{"./views/UserForm":"src/views/UserForm.ts","./models/User":"src/models/User.ts"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -2636,7 +2674,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49362" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54932" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -29,9 +29,9 @@ export class User extends Model<UserProps> {
         );
     }
 
-    isAdminUser(): boolean {
-        // we can have some real implementation here
-        return false;
+    setRandomAge(): void {
+        const age = Math.round(Math.random() * 100);
+        this.set({ age });
     }
 }
 
