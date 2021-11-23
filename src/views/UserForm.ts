@@ -11,6 +11,13 @@ export class UserForm {
     });
   }
 
+  eventsMap(): { [key: string]: () => void } {
+    return {
+      'click:.set-age': this.onSetAgeClick,
+      'click:.set-name': this.onSetNameClick
+    };
+  }
+
   onSetNameClick = (): void => {
     const input = this.parent.querySelector('input');
 
@@ -25,6 +32,19 @@ export class UserForm {
     this.model.setRandomAge();
   };
 
+
+  bindEvents(fragment: DocumentFragment): void {
+    const eventsMap = this.eventsMap();
+
+    for (let eventKey in eventsMap) {
+      const [eventName, selector] = eventKey.split(':');
+
+      fragment.querySelectorAll(selector).forEach(element => {
+        element.addEventListener(eventName, eventsMap[eventKey]);
+      });
+    }
+  }
+  
   template(): string {
     return `
       <div>
