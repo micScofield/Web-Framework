@@ -118,7 +118,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"src/views/View.ts":[function(require,module,exports) {
-"use strict"; // IMPORTANT - 1. A workaround if we don't want to use Model from "../models/Model" is to use ModelForView. But it is not ideal. Model however is also a Generic class which expects an interface eg: UserProps. So when creating a child class out of this, we can specify User and UserProps as two generic types. 
+"use strict"; // IMPORTANT - 1. A workaround if we don't want to use Model from "../models/Model" is to use ModelForView. But it is not ideal. Model however is also a Generic class which expects an interface eg: UserProps. So when creating a child class out of this, we can specify User and UserProps as two generic types.
 // 2. To have an method which may or may not be implemented by child class (i.e. optional), we can use 2nd implementation of eventsMap. If its a must we can use 1st one which is commented out.
 
 Object.defineProperty(exports, "__esModule", {
@@ -140,6 +140,7 @@ var View = function () {
   };
 
   View.prototype.regionsMap = function () {
+    // eg: { 'UserShow': '.user-show' }
     return {};
   };
 
@@ -169,11 +170,31 @@ var View = function () {
     }
   };
 
+  View.prototype.mapRegions = function (fragment) {
+    var regionsMap = this.regionsMap();
+
+    for (var key in regionsMap) {
+      var selector = regionsMap[key];
+      var element = fragment.querySelector(selector);
+
+      if (element) {
+        this.regions[key] = element;
+      }
+      /* regions might look like {
+          userShow: <div class='user-show'></div>,
+          userForm: <div class='user-form'></div>
+         }
+      */
+
+    }
+  };
+
   View.prototype.render = function () {
     this.parent.innerHTML = "";
     var templateElement = document.createElement("template");
     templateElement.innerHTML = this.template();
     this.bindEvents(templateElement.content);
+    this.mapRegions(templateElement.content);
     this.parent.append(templateElement.content);
   };
 

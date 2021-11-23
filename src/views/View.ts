@@ -1,4 +1,4 @@
-// IMPORTANT - 1. A workaround if we don't want to use Model from "../models/Model" is to use ModelForView. But it is not ideal. Model however is also a Generic class which expects an interface eg: UserProps. So when creating a child class out of this, we can specify User and UserProps as two generic types. 
+// IMPORTANT - 1. A workaround if we don't want to use Model from "../models/Model" is to use ModelForView. But it is not ideal. Model however is also a Generic class which expects an interface eg: UserProps. So when creating a child class out of this, we can specify User and UserProps as two generic types.
 // 2. To have an method which may or may not be implemented by child class (i.e. optional), we can use 2nd implementation of eventsMap. If its a must we can use 1st one which is commented out.
 
 import { Model } from "../models/Model";
@@ -19,13 +19,14 @@ export abstract class View<T extends Model<K>, K> {
     // abstract eventsMap(): { [key: string]: () => void };
 
     eventsMap(): { [key: string]: () => void } {
-      return {}
+        return {};
     }
 
     abstract template(): string;
 
-    regionsMap(): { [key: string]: string } { // eg: { 'UserShow': '.user-show' }
-      return {}
+    regionsMap(): { [key: string]: string } {
+        // eg: { 'UserShow': '.user-show' }
+        return {};
     }
 
     bindModel(): void {
@@ -46,6 +47,26 @@ export abstract class View<T extends Model<K>, K> {
         }
     }
 
+    mapRegions(fragment: DocumentFragment): void {
+        const regionsMap = this.regionsMap();
+
+        for (let key in regionsMap) {
+            const selector = regionsMap[key];
+
+            const element = fragment.querySelector(selector);
+
+            if(element) {
+              this.regions[key] = element;
+            }
+
+            /* regions might look like {
+                userShow: <div class='user-show'></div>,
+                userForm: <div class='user-form'></div>
+               }
+            */
+        }
+    }
+
     render(): void {
         this.parent.innerHTML = "";
 
@@ -53,6 +74,8 @@ export abstract class View<T extends Model<K>, K> {
         templateElement.innerHTML = this.template();
 
         this.bindEvents(templateElement.content);
+
+        this.mapRegions(templateElement.content);
 
         this.parent.append(templateElement.content);
     }
