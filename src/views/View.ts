@@ -80,8 +80,9 @@ export abstract class View<T extends Model<K>, K> {
         this.mapRegions(templateElement.content);
 
         // setup view nesting right before we render html to the dom
+        console.log('before onrender', this.regions)
         this.onRender();
-
+        console.log('after onrender', this.regions);
         this.parent.append(templateElement.content);
     }
 }

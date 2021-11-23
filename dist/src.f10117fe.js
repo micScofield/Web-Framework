@@ -2677,7 +2677,9 @@ var View = function () {
     this.bindEvents(templateElement.content);
     this.mapRegions(templateElement.content); // setup view nesting right before we render html to the dom
 
+    console.log('before onrender', this.regions);
     this.onRender();
+    console.log('after onrender', this.regions);
     this.parent.append(templateElement.content);
   };
 
@@ -2878,10 +2880,13 @@ var UserEdit = function (_super) {
   };
 
   UserEdit.prototype.onRender = function () {
-    // create instances of both regions and call render
+    console.log('Inside onRender of UserEdit'); // create instances of both regions and call render
+
     var userShow = new UserShow_1.UserShow(this.regions.userShow, this.model);
+    console.log('Inside onRender of UserEdit, calling userShow');
     userShow.render();
     var userForm = new UserForm_1.UserForm(this.regions.userForm, this.model);
+    console.log('Inside onRender of UserEdit, calling userForm');
     userForm.render();
   };
 

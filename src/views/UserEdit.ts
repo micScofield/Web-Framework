@@ -12,11 +12,14 @@ export class UserEdit extends View<User, UserProps> {
     }
 
     onRender(): void {
+        console.log('Inside onRender of UserEdit');
         // create instances of both regions and call render
         const userShow = new UserShow(this.regions.userShow, this.model);
+        console.log('Inside onRender of UserEdit, calling userShow');
         userShow.render();
 
         const userForm = new UserForm(this.regions.userForm, this.model);
+        console.log('Inside onRender of UserEdit, calling userForm');
         userForm.render();
     }
 
