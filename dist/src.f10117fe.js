@@ -230,18 +230,23 @@ var UserForm = function (_super) {
       _this.model.setRandomAge();
     };
 
+    _this.onSaveClick = function () {
+      _this.model.save();
+    };
+
     return _this;
   }
 
   UserForm.prototype.eventsMap = function () {
     return {
       'click:.set-age': this.onSetAgeClick,
-      'click:.set-name': this.onSetNameClick
+      'click:.set-name': this.onSetNameClick,
+      'click:.save-model': this.onSaveClick
     };
   };
 
   UserForm.prototype.template = function () {
-    return "\n      <div>\n        <input placeholder=\"" + this.model.get('name') + "\" />\n        <button class=\"set-name\">Change Name</button>\n        <button class=\"set-age\">Set Random Age</button>\n      </div>\n    ";
+    return "\n      <div>\n        <input placeholder=\"" + this.model.get('name') + "\" />\n        <button class=\"set-name\">Change Name</button>\n        <button class=\"set-age\">Set Random Age</button>\n        <button class=\"save-model\">Save</button>\n      </div>\n    ";
   };
 
   UserForm.prototype.render = function () {
